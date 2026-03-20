@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WriteFlow - AI PDF Reader</title>
+
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #f5f7fa; 
+            color: #333; 
+            padding: 40px; 
+            text-align: center; 
+        }
+
+        input, button { 
+            margin: 8px; 
+            padding: 10px 15px; 
+            font-size: 16px; 
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+        }
+
+        button {
+            background-color: #1a73e8;
+            color: white;
+        }
+
+        button:hover {
+            background-color: #1557b0;
+        }
+
+        .controls {
+            margin-top: 10px;
+        }
+
+        #result { 
+            margin-top: 20px; 
+            white-space: pre-wrap; 
+            text-align: left; 
+            max-width: 600px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            background: #fff; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            max-height: 400px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .word {
+            margin: 2px;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+
+        .highlight {
+            background-color: yellow;
+            color: #000;
+            font-weight: bold;
+            padding: 3px 4px;
+            border-radius: 4px;
+            transform: scale(1.1);
+        }
+
+        .speed-control {
+            margin-top: 15px;
+        }
+
+        #speed {
+            width: 220px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>WriteFlow - AI PDF Reader</h1>
+    <p>Upload a PDF to extract text and listen as voice 🎧</p>
+
+    <input type="file" id="pdfFile" accept=".pdf" />
+    
+    <div class="controls">
+        <button onclick="uploadPDF()">Upload PDF</button>
+        <button onclick="speakText()">▶ Listen</button>
+        <button onclick="pauseSpeech()">⏸ Pause</button>
+        <button onclick="resumeSpeech()">⏯ Resume</button>
+    </div>
+
+    <div class="speed-control">
+        <label>Speed: <span id="speedValue">1x</span></label><br>
+        <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1">
+    </div>
+
+    <div id="result"></div>
+
+    <!-- 🔥 FINAL FIX: correct static path -->
+    <script src="/static/script.js"></script>
+
+</body>
+</html>
