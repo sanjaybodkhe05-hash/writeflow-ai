@@ -1,3 +1,5 @@
+Java new :
+
 console.log("WriteFlow JS Loaded 🚀");
 
 let speechRate = 1;
@@ -7,19 +9,31 @@ let isSpeaking = false;
 let isPaused = false;
 
 document.addEventListener("DOMContentLoaded", () => {
+    // 🔥 FIX 1: Upload button event binding
+    const uploadBtn = document.getElementById("uploadBtn");
+    if (uploadBtn) {
+        uploadBtn.addEventListener("click", uploadPDF);
+    }
+
+    // Existing slider logic
     const slider = document.getElementById("speed");
     const display = document.getElementById("speedValue");
 
-    slider.addEventListener("input", () => {
-        speechRate = slider.value;
-        display.innerText = slider.value + "x";
-    });
+    if (slider && display) {
+        slider.addEventListener("input", () => {
+            speechRate = slider.value;
+            display.innerText = slider.value + "x";
+        });
+    }
 });
 
 async function uploadPDF() {
+    console.log("BUTTON CLICKED 🔥"); // 🔥 debug
+
     const fileInput = document.getElementById("pdfFile");
 
-    if (!fileInput || !fileInput.files.length) {
+    // 🔥 FIX 2: safe check
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
         alert("Please select a PDF first!");
         return;
     }
@@ -33,14 +47,18 @@ async function uploadPDF() {
             body: formData
         });
 
+        // 🔥 FIX 3: better error handling
         if (!response.ok) {
-            throw new Error("Upload failed");
+            console.error("Server response error:", response.status);
+            alert("Server error while uploading!");
+            return;
         }
 
         const data = await response.json();
 
-        if (!data.text) {
-            throw new Error("No text received");
+        if (!data || !data.text) {
+            alert("No text received from server!");
+            return;
         }
 
         const words = data.text.split(/\s+/);
@@ -52,8 +70,8 @@ async function uploadPDF() {
         wordsList = document.querySelectorAll(".word");
 
     } catch (err) {
-        console.error(err);
-        alert("Upload failed. Check backend!");
+        console.error("UPLOAD ERROR:", err);
+        alert("Upload failed. Backend issue!");
     }
 }
 
