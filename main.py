@@ -1,11 +1,12 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles  # 🔥 ADD THIS
 import pdfplumber
 
 app = FastAPI()
 
-# 🔥 CORS
+# 🔥 CORS (no change)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,21 +15,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 🔥 STATIC FILES (IMPORTANT FIX)
+app.mount("/static", StaticFiles(directory="."), name="static")
+
 # 🔥 Serve HTML
 @app.get("/", response_class=HTMLResponse)
 async def home():
     with open("index.html", "r", encoding="utf-8") as f:
         return f.read()
 
-# 🔥 Upload API (TEXT ONLY - SAFE FOR RENDER)
+# 🔥 Upload API (IMPROVED ERROR HANDLING)
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
     text = ""
 
-    with pdfplumber.open(file.file) as pdf:
-        for page in pdf.pages:
-            page_text = page.extract_text()
-            if page_text:
-                text += page_text + "\n"
+    try:
+        with pdfplumber.open(file.file) as pdf:
+            for page in pdf.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
 
-    return {"text": text}
+        return {"text": text}
+
+    except Exception as e:
+        return {"text": "", "error": str(e)}
