@@ -86,3 +86,17 @@ async def signup(email: str = Form(...), password: str = Form(...)):
 
     except:
         return {"error": "User already exists ❌"}
+
+# 🔥 LOGIN API (NEW)
+@app.post("/login")
+async def login(email: str = Form(...), password: str = Form(...)):
+    cursor.execute("SELECT password FROM users WHERE email=?", (email,))
+    user = cursor.fetchone()
+
+    if not user:
+        return {"error": "User not found ❌"}
+
+    if verify_password(password, user[0]):
+        return {"message": "Login successful ✅"}
+    else:
+        return {"error": "Wrong password ❌"}
