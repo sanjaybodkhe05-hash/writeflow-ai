@@ -69,3 +69,20 @@ def hash_password(password):
 
 def verify_password(plain, hashed):
     return pwd_context.verify(plain, hashed)
+    from fastapi import Form
+
+@app.post("/signup")
+async def signup(email: str = Form(...), password: str = Form(...)):
+    try:
+        hashed_password = hash_password(password)
+
+        cursor.execute(
+            "INSERT INTO users (email, password) VALUES (?, ?)",
+            (email, hashed_password)
+        )
+        conn.commit()
+
+        return {"message": "Signup successful ✅"}
+
+    except:
+        return {"error": "User already exists ❌"}
