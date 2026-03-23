@@ -95,6 +95,20 @@ async def login(email: str = Form(...), password: str = Form(...)):
 
     if not user:
         return {"error": "User not found ❌"}
+        @app.post("/login")
+async def login(email: str = Form(...), password: str = Form(...)):
+    cursor.execute("SELECT password FROM users WHERE email=?", (email,))
+    user = cursor.fetchone()
+
+    if not user:
+        return {"error": "User not found ❌"}
+
+    stored_password = user[0]
+
+    if verify_password(password, stored_password):
+        return {"message": "Login successful ✅"}
+    else:
+        return {"error": "Wrong password ❌"}
 
     if verify_password(password, user[0]):
         return {"message": "Login successful ✅"}
