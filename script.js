@@ -13,7 +13,7 @@ window.onload = () => {
     const uploadBtn = document.getElementById("uploadBtn");
 
     if (uploadBtn) {
-        uploadBtn.onclick = uploadPDF;  // 🔥 STRONG FIX
+        uploadBtn.onclick = uploadPDF;
         console.log("Upload button connected ✅");
     } else {
         console.log("Upload button NOT found ❌");
@@ -76,7 +76,7 @@ async function uploadPDF() {
     }
 }
 
-// 🔥 SPEECH FUNCTIONS (NO CHANGE)
+// 🔥 SPEECH FUNCTIONS
 function speakText() {
     if (!wordsList.length) {
         alert("No text found!");
@@ -131,6 +131,7 @@ function stopSpeech() {
 
     wordsList.forEach(w => w.classList.remove("highlight"));
 }
+
 // 🔥 SIGNUP FUNCTION
 async function signup() {
     const email = document.getElementById("email").value;
@@ -160,11 +161,42 @@ async function signup() {
     }
 }
 
-// 🔥 LOGIN FUNCTION
+// 🔥 FIXED LOGIN FUNCTION (REAL API CALL)
 async function login() {
-    alert("Login feature coming next 😎");
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    if (!email || !password) {
+        alert("Enter email & password!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("password", password);
+
+    try {
+        const res = await fetch("/login", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await res.json();
+
+        console.log("LOGIN RESPONSE:", data);
+
+        if (data.message) {
+            alert(data.message);
+        } else {
+            alert(data.error);
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Login failed!");
+    }
 }
 
-// 🔥 VERY IMPORTANT (GLOBAL FIX)
+// 🔥 GLOBAL ACCESS (IMPORTANT)
 window.signup = signup;
 window.login = login;
