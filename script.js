@@ -131,3 +131,40 @@ function stopSpeech() {
 
     wordsList.forEach(w => w.classList.remove("highlight"));
 }
+// 🔥 SIGNUP FUNCTION
+async function signup() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    if (!email || !password) {
+        alert("Enter email & password!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("password", password);
+
+    try {
+        const res = await fetch("/signup", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await res.json();
+        alert(data.message || data.error);
+
+    } catch (err) {
+        console.error(err);
+        alert("Signup failed!");
+    }
+}
+
+// 🔥 LOGIN FUNCTION
+async function login() {
+    alert("Login feature coming next 😎");
+}
+
+// 🔥 VERY IMPORTANT (GLOBAL FIX)
+window.signup = signup;
+window.login = login;
