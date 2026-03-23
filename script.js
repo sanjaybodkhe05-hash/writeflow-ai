@@ -1,5 +1,3 @@
-Java new :
-
 console.log("WriteFlow JS Loaded 🚀");
 
 let speechRate = 1;
@@ -8,14 +6,19 @@ let currentIndex = 0;
 let isSpeaking = false;
 let isPaused = false;
 
-document.addEventListener("DOMContentLoaded", () => {
-    // 🔥 FIX 1: Upload button event binding
+// 🔥 GUARANTEED BUTTON BINDING
+window.onload = () => {
+    console.log("WINDOW LOADED ✅");
+
     const uploadBtn = document.getElementById("uploadBtn");
+
     if (uploadBtn) {
-        uploadBtn.addEventListener("click", uploadPDF);
+        uploadBtn.onclick = uploadPDF;  // 🔥 STRONG FIX
+        console.log("Upload button connected ✅");
+    } else {
+        console.log("Upload button NOT found ❌");
     }
 
-    // Existing slider logic
     const slider = document.getElementById("speed");
     const display = document.getElementById("speedValue");
 
@@ -25,14 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
             display.innerText = slider.value + "x";
         });
     }
-});
+};
 
 async function uploadPDF() {
-    console.log("BUTTON CLICKED 🔥"); // 🔥 debug
+    console.log("BUTTON CLICKED 🔥");
 
     const fileInput = document.getElementById("pdfFile");
 
-    // 🔥 FIX 2: safe check
     if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
         alert("Please select a PDF first!");
         return;
@@ -47,9 +49,8 @@ async function uploadPDF() {
             body: formData
         });
 
-        // 🔥 FIX 3: better error handling
         if (!response.ok) {
-            console.error("Server response error:", response.status);
+            console.error("Server error:", response.status);
             alert("Server error while uploading!");
             return;
         }
@@ -57,7 +58,7 @@ async function uploadPDF() {
         const data = await response.json();
 
         if (!data || !data.text) {
-            alert("No text received from server!");
+            alert("No text received!");
             return;
         }
 
@@ -75,6 +76,7 @@ async function uploadPDF() {
     }
 }
 
+// 🔥 SPEECH FUNCTIONS (NO CHANGE)
 function speakText() {
     if (!wordsList.length) {
         alert("No text found!");
