@@ -45,3 +45,27 @@ async def upload_pdf(file: UploadFile = File(...)):
     except Exception as e:
         print("ERROR:", e)  # 🔥 Debug log
         return {"text": "", "error": str(e)}
+        import sqlite3
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# 🔥 DB INIT
+conn = sqlite3.connect("users.db", check_same_thread=False)
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT UNIQUE,
+    password TEXT
+)
+""")
+conn.commit()
+
+# 🔐 HASH FUNCTIONS
+def hash_password(password):
+    return pwd_context.hash(password)
+
+def verify_password(plain, hashed):
+    return pwd_context.verify(plain, hashed)
