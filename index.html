@@ -1,4 +1,4 @@
-HTML new :
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,7 +73,7 @@ HTML new :
     <input type="file" id="pdfFile" accept=".pdf" />
 
     <div>
-        <!-- 🔥 FIX 1: onclick hata ke id diya -->
+        <!-- ✅ FIXED BUTTON -->
         <button id="uploadBtn">Upload PDF</button>
 
         <button onclick="speakText()">▶ Listen</button>
@@ -89,8 +89,8 @@ HTML new :
 
     <div id="result"></div>
 
-    <!-- 🔥 FIX 2: correct static path -->
-    <script src="/static/script.js"></script>
+    <!-- 🔥 IMPORTANT: cache avoid -->
+    <script src="/static/script.js?v=2"></script>
 
 </body>
 </html>
