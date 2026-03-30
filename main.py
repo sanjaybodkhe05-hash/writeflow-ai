@@ -67,15 +67,24 @@ async def upload_pdf(file: UploadFile = File(...)):
         return {"text": text}
 
     except Exception as e:
-        print("ERROR:", e)
+        print("UPLOAD ERROR:", e)
         return {"text": "", "error": str(e)}
 
-# 🔥 SIGNUP API
+# 🔥 SIGNUP API (FIXED)
 @app.post("/signup")
 async def signup(email: str = Form(...), password: str = Form(...)):
     try:
+        # 🔥 CHECK IF USER EXISTS
+        cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
+        existing_user = cursor.fetchone()
+
+        if existing_user:
+            return {"error": "User already exists ❌"}
+
+        # 🔥 HASH PASSWORD
         hashed_password = hash_password(password)
 
+        # 🔥 INSERT NEW USER
         cursor.execute(
             "INSERT INTO users (email, password) VALUES (?, ?)",
             (email, hashed_password)
@@ -84,8 +93,9 @@ async def signup(email: str = Form(...), password: str = Form(...)):
 
         return {"message": "Signup successful ✅"}
 
-    except:
-        return {"error": "User already exists ❌"}
+    except Exception as e:
+        print("SIGNUP ERROR:", e)
+        return {"error": str(e)}
 
 # 🔥 LOGIN API
 @app.post("/login")
@@ -105,4 +115,5 @@ async def login(email: str = Form(...), password: str = Form(...)):
             return {"error": "Wrong password ❌"}
 
     except Exception as e:
+        print("LOGIN ERROR:", e)
         return {"error": str(e)}
