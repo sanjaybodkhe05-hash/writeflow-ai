@@ -127,3 +127,4 @@ async def login(email: str = Form(...), password: str = Form(...)):
     except Exception as e:
         print("LOGIN ERROR:", e)
         return {"error": str(e)}
+        #update
