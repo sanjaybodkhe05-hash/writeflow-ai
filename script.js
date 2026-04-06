@@ -30,6 +30,7 @@ window.onload = () => {
     }
 };
 
+// 🔥 UPLOAD PDF
 async function uploadPDF() {
     console.log("BUTTON CLICKED 🔥");
 
@@ -132,10 +133,10 @@ function stopSpeech() {
     wordsList.forEach(w => w.classList.remove("highlight"));
 }
 
-// 🔥 SIGNUP FUNCTION
+// 🔥 SIGNUP FUNCTION (FIXED)
 async function signup() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    let email = document.getElementById("email").value.trim();
+    let password = document.getElementById("password").value.trim();
 
     if (!email || !password) {
         alert("Enter email & password!");
@@ -153,18 +154,29 @@ async function signup() {
         });
 
         const data = await res.json();
-        alert(data.message || data.error);
+        console.log("SIGNUP RESPONSE:", data);
+
+        if (data.message) {
+            alert(data.message);
+
+            // 🔥 CLEAR INPUT AFTER SUCCESS
+            document.getElementById("email").value = "";
+            document.getElementById("password").value = "";
+
+        } else {
+            alert(data.error);
+        }
 
     } catch (err) {
-        console.error(err);
+        console.error("SIGNUP ERROR:", err);
         alert("Signup failed!");
     }
 }
 
-// 🔥 FIXED LOGIN FUNCTION (REAL API CALL)
+// 🔥 LOGIN FUNCTION (FIXED)
 async function login() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    let email = document.getElementById("email").value.trim();
+    let password = document.getElementById("password").value.trim();
 
     if (!email || !password) {
         alert("Enter email & password!");
@@ -182,17 +194,20 @@ async function login() {
         });
 
         const data = await res.json();
-
         console.log("LOGIN RESPONSE:", data);
 
         if (data.message) {
             alert(data.message);
+
+            // 🔥 OPTIONAL: future dashboard redirect
+            // window.location.href = "/dashboard";
+
         } else {
             alert(data.error);
         }
 
     } catch (err) {
-        console.error(err);
+        console.error("LOGIN ERROR:", err);
         alert("Login failed!");
     }
 }
