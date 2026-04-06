@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 import pdfplumber
 import sqlite3
 import io
-import hashlib  # 🔥 ADD THIS
+import hashlib
 from passlib.context import CryptContext
 
 app = FastAPI()
@@ -38,13 +38,14 @@ CREATE TABLE IF NOT EXISTS users (
 """)
 conn.commit()
 
-# 🔐 HASH FUNCTIONS (🔥 FIXED)
+# 🔐 HASH FUNCTIONS (FIXED)
 def hash_password(password):
-    # 🔥 FIX: convert to fixed length before bcrypt
+    password = password.strip()  # 🔥 FIX
     password = hashlib.sha256(password.encode()).hexdigest()
     return pwd_context.hash(password)
 
 def verify_password(plain, hashed):
+    plain = plain.strip()  # 🔥 FIX
     plain = hashlib.sha256(plain.encode()).hexdigest()
     return pwd_context.verify(plain, hashed)
 
@@ -74,18 +75,24 @@ async def upload_pdf(file: UploadFile = File(...)):
         print("UPLOAD ERROR:", e)
         return {"text": "", "error": str(e)}
 
-# 🔥 SIGNUP API
+# 🔥 SIGNUP API (FIXED)
 @app.post("/signup")
 async def signup(email: str = Form(...), password: str = Form(...)):
     try:
+        email = email.strip().lower()   # 🔥 FIX
+        password = password.strip()     # 🔥 FIX
+
+        # 🔥 CHECK EXISTING USER
         cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
         existing_user = cursor.fetchone()
 
         if existing_user:
             return {"error": "User already exists ❌"}
 
+        # 🔥 HASH PASSWORD
         hashed_password = hash_password(password)
 
+        # 🔥 INSERT USER
         cursor.execute(
             "INSERT INTO users (email, password) VALUES (?, ?)",
             (email, hashed_password)
@@ -96,12 +103,15 @@ async def signup(email: str = Form(...), password: str = Form(...)):
 
     except Exception as e:
         print("SIGNUP ERROR:", e)
-        return {"error": str(e)}
+        return {"error": "Signup failed ❌"}
 
-# 🔥 LOGIN API
+# 🔥 LOGIN API (FIXED CLEAN)
 @app.post("/login")
 async def login(email: str = Form(...), password: str = Form(...)):
     try:
+        email = email.strip().lower()   # 🔥 FIX
+        password = password.strip()     # 🔥 FIX
+
         cursor.execute("SELECT password FROM users WHERE email = ?", (email,))
         user = cursor.fetchone()
 
@@ -117,4 +127,4 @@ async def login(email: str = Form(...), password: str = Form(...)):
 
     except Exception as e:
         print("LOGIN ERROR:", e)
-        return {"error": str(e)}
+        return {"error": "Login failed ❌"}
