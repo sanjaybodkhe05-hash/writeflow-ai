@@ -23,9 +23,10 @@ app.add_middleware(
 # 🔥 STATIC FILES
 app.mount("/static", StaticFiles(directory="."), name="static")
 
-# 🔥 DATABASE SETUP
+# 🔥 PASSWORD CONFIG
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# 🔥 DATABASE
 conn = sqlite3.connect("users.db", check_same_thread=False)
 cursor = conn.cursor()
 
@@ -38,31 +39,29 @@ CREATE TABLE IF NOT EXISTS users (
 """)
 conn.commit()
 
-# 🔐 HASH FUNCTIONS (FIXED)
+# 🔐 HASH FUNCTIONS (FINAL FIX)
 def hash_password(password):
-    password = password.strip()  # 🔥 FIX
+    password = password.strip()
     password = hashlib.sha256(password.encode()).hexdigest()
     return pwd_context.hash(password)
 
 def verify_password(plain, hashed):
-    plain = plain.strip()  # 🔥 FIX
+    plain = plain.strip()
     plain = hashlib.sha256(plain.encode()).hexdigest()
     return pwd_context.verify(plain, hashed)
 
-# 🔥 HOME ROUTE
+# 🔥 HOME
 @app.get("/", response_class=HTMLResponse)
 async def home():
     with open("index.html", "r", encoding="utf-8") as f:
         return f.read()
 
-# 🔥 UPLOAD API
+# 🔥 PDF UPLOAD
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
     text = ""
-
     try:
         contents = await file.read()
-
         with pdfplumber.open(io.BytesIO(contents)) as pdf:
             for page in pdf.pages:
                 page_text = page.extract_text()
@@ -75,24 +74,24 @@ async def upload_pdf(file: UploadFile = File(...)):
         print("UPLOAD ERROR:", e)
         return {"text": "", "error": str(e)}
 
-# 🔥 SIGNUP API (FIXED)
+# 🔥 SIGNUP (FULL FIX)
 @app.post("/signup")
 async def signup(email: str = Form(...), password: str = Form(...)):
     try:
-        email = email.strip().lower()   # 🔥 FIX
-        password = password.strip()     # 🔥 FIX
+        email = email.strip().lower()
+        password = password.strip()
 
-        # 🔥 CHECK EXISTING USER
+        # 🔥 CHECK USER
         cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
         existing_user = cursor.fetchone()
 
         if existing_user:
             return {"error": "User already exists ❌"}
 
-        # 🔥 HASH PASSWORD
+        # 🔥 HASH
         hashed_password = hash_password(password)
 
-        # 🔥 INSERT USER
+        # 🔥 INSERT
         cursor.execute(
             "INSERT INTO users (email, password) VALUES (?, ?)",
             (email, hashed_password)
@@ -103,14 +102,14 @@ async def signup(email: str = Form(...), password: str = Form(...)):
 
     except Exception as e:
         print("SIGNUP ERROR:", e)
-        return {"error": "Signup failed ❌"}
+        return {"error": str(e)}   # 🔥 REAL ERROR SHOW
 
-# 🔥 LOGIN API (FIXED CLEAN)
+# 🔥 LOGIN
 @app.post("/login")
 async def login(email: str = Form(...), password: str = Form(...)):
     try:
-        email = email.strip().lower()   # 🔥 FIX
-        password = password.strip()     # 🔥 FIX
+        email = email.strip().lower()
+        password = password.strip()
 
         cursor.execute("SELECT password FROM users WHERE email = ?", (email,))
         user = cursor.fetchone()
@@ -127,4 +126,4 @@ async def login(email: str = Form(...), password: str = Form(...)):
 
     except Exception as e:
         print("LOGIN ERROR:", e)
-        return {"error": "Login failed ❌"}
+        return {"error": str(e)}
