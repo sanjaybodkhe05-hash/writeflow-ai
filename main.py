@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 import pdfplumber
 import sqlite3
 import io
+import hashlib  # 🔥 ADD THIS
 from passlib.context import CryptContext
 
 app = FastAPI()
@@ -37,11 +38,14 @@ CREATE TABLE IF NOT EXISTS users (
 """)
 conn.commit()
 
-# 🔐 HASH FUNCTIONS
+# 🔐 HASH FUNCTIONS (🔥 FIXED)
 def hash_password(password):
+    # 🔥 FIX: convert to fixed length before bcrypt
+    password = hashlib.sha256(password.encode()).hexdigest()
     return pwd_context.hash(password)
 
 def verify_password(plain, hashed):
+    plain = hashlib.sha256(plain.encode()).hexdigest()
     return pwd_context.verify(plain, hashed)
 
 # 🔥 HOME ROUTE
@@ -70,21 +74,18 @@ async def upload_pdf(file: UploadFile = File(...)):
         print("UPLOAD ERROR:", e)
         return {"text": "", "error": str(e)}
 
-# 🔥 SIGNUP API (FIXED)
+# 🔥 SIGNUP API
 @app.post("/signup")
 async def signup(email: str = Form(...), password: str = Form(...)):
     try:
-        # 🔥 CHECK IF USER EXISTS
         cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
         existing_user = cursor.fetchone()
 
         if existing_user:
             return {"error": "User already exists ❌"}
 
-        # 🔥 HASH PASSWORD
         hashed_password = hash_password(password)
 
-        # 🔥 INSERT NEW USER
         cursor.execute(
             "INSERT INTO users (email, password) VALUES (?, ?)",
             (email, hashed_password)
