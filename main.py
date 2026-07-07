@@ -7,6 +7,8 @@ import pdfplumber
 import sqlite3
 import io
 import hashlib
+import google.generativeai as genai
+import os
 from passlib.context import CryptContext
 
 app = FastAPI()
