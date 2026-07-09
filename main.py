@@ -131,4 +131,28 @@ async def login(email: str = Form(...), password: str = Form(...)):
     except Exception as e:
         print("LOGIN ERROR:", e)
         return {"error": str(e)}
-        #update
+
+
+# 🤖 AI SUMMARY
+@app.post("/summary")
+async def generate_summary(text: str = Form(...)):
+    try:
+        response = model.generate_content(
+            f"""
+            Summarize the following PDF text into easy-to-understand bullet points.
+
+            PDF Text:
+            {text}
+            """
+        )
+
+        return {
+            "summary": response.text
+        }
+
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
+
+#update
