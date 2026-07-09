@@ -12,6 +12,8 @@ import os
 from passlib.context import CryptContext
 
 app = FastAPI()
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 # 🔥 CORS
 app.add_middleware(
